@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
 
   if (isAuthenticated && user) {
     // Jedno miejsce decydujące o przekierowaniu po zalogowaniu
-    const redirectPath = getRedirectPathForRole(user.role);
+    const redirectPath = getRedirectPathForRole(user?.role ?? "");
     return <Navigate to={redirectPath} replace />;
   }
 

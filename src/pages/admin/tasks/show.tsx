@@ -10,13 +10,30 @@ import { ArrowLeft, Edit } from "lucide-react";
 import { useLoading } from "@/utility";
 import { SubPage } from "@/components/layout";
 
+type Task = {
+  id: string | number;
+  title: string;
+  type: string;
+  status: string;
+  branch_id: number;
+  start_at: string;
+  end_at?: string | null;
+  assigned_driver?: string | null;
+  assigned_vehicle_id?: number | null;
+  assigned_container_id?: number | null;
+};
+
 export const TasksShow = () => {
-  const { queryResult } = useShow({ resource: "tasks" });
+  const { queryResult } = useShow<Task>({ resource: "tasks" });
   const { list, edit } = useNavigation();
-  const { data, isLoading, isError } = queryResult;
-  const record = data?.data;
+
+  const isLoading = queryResult?.isLoading ?? true;
+  const isError = queryResult?.isError ?? false;
+  const record = queryResult?.data?.data; // Task | undefined
+
   const init = useLoading({ isLoading, isError });
   if (init) return init;
+  if (!record) return null; // ✅ zawężenie typu – brak ostrzeżenia
 
   return (
     <SubPage>
@@ -25,10 +42,7 @@ export const TasksShow = () => {
       </Button>
 
       <FlexBox>
-        <Lead
-          title={record.title}
-          description={`ID: #${String(record.id).slice(0, 8)}`}
-        />
+        <Lead title={record.title} description={`ID: #${String(record.id).slice(0, 8)}`} />
         <Button variant="outline" onClick={() => edit("tasks", record.id)}>
           <Edit className="w-4 h-4 mr-2" /> Edytuj
         </Button>

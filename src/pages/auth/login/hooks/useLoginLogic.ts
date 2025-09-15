@@ -26,7 +26,7 @@ export const useLoginLogic = () => {
     setIsLoading(false);
     
     if (result.success) {
-      navigate(result.redirectTo || '/');
+      navigate((result as { success: boolean; redirectTo: string; error: any; }).redirectTo || '/');
     } else {
       setError(result.error);
     }
