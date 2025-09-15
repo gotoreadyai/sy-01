@@ -1,3 +1,4 @@
+
 // ================================
 // path: src/pages/admin/pricelists/edit.tsx
 // ================================
@@ -15,8 +16,14 @@ import { LookupSelect } from "@/components/form/LookupSelect";
 
 export const PricelistsEdit = () => {
   const { show } = useNavigation();
-  const { refineCore: { onFinish, queryResult }, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
-    useForm({ refineCoreProps: { resource: "pricelists", action: "edit" } });
+  const {
+    refineCore: { onFinish, queryResult },
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm({ refineCoreProps: { resource: "price_lists", action: "edit" } });
 
   const isLoading = queryResult?.isLoading ?? true;
   const isError = queryResult?.isError ?? false;
@@ -28,25 +35,29 @@ export const PricelistsEdit = () => {
 
   return (
     <SubPage>
-      <Button variant="outline" size="sm" onClick={() => show("pricelists", record.id)}>
+      <Button variant="outline" size="sm" onClick={() => show("price_lists", record.id)}>
         <ArrowLeft className="w-4 h-4 mr-2" /> Powrót do szczegółów
       </Button>
 
-      <FlexBox><Lead title="Edycja cennika" description={`ID: #${record.id}`} /></FlexBox>
+      <FlexBox>
+        <Lead title="Edycja cennika" description={`ID: #${record.id}`} />
+      </FlexBox>
 
       <Card>
-        <CardHeader><CardTitle>Parametry</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Parametry</CardTitle>
+        </CardHeader>
         <CardContent>
           <Form onSubmit={handleSubmit(onFinish)}>
             <GridBox variant="1-2-2">
-              <FormControl label="Nazwa" htmlFor="name" error={errors.name?.message as string} required>
-                <Input id="name" {...register("name", { required: "Wymagane" })} />
+              <FormControl label="Nazwa" htmlFor="title" error={errors.title?.message as string} required>
+                <Input id="title" {...register("title", { required: "Wymagane" })} />
               </FormControl>
               <FormControl label="Oddział (opcjonalnie)">
                 <LookupSelect
                   resource="branches"
                   value={watch("branch_id") ?? record.branch_id}
-                  onChange={(v) => setValue("branch_id", Number(v))}
+                  onChange={(v) => setValue("branch_id", v ? Number(v) : null)}
                   renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
                   placeholder="Globalny lub przypisany do oddziału"
                 />
@@ -54,25 +65,22 @@ export const PricelistsEdit = () => {
             </GridBox>
 
             <GridBox variant="1-2-2">
-              <FormControl label="Etykieta wersji" htmlFor="version_label">
-                <Input id="version_label" {...register("version_label")} />
-              </FormControl>
-              <FormControl label="Ustaw jako aktywny">
-                <input type="checkbox" {...register("is_current")} />
+              <FormControl label="Etykieta wersji" htmlFor="version_tag">
+                <Input id="version_tag" {...register("version_tag")} />
               </FormControl>
             </GridBox>
 
-            <FormControl label="Treść cennika (rich-text)">
-              <Textarea rows={10} {...register("content")} />
-            </FormControl>
-
-            <FormControl label="Archiwum">
-              <input type="checkbox" {...register("is_archived")} />
+            <FormControl label="Treść cennika (rich-text)" error={errors.content_rich?.message as string} required>
+              <Textarea rows={10} {...register("content_rich", { required: "Wymagane" })} />
             </FormControl>
 
             <FormActions>
-              <Button type="button" variant="outline" onClick={() => show("pricelists", record.id)}>Anuluj</Button>
-              <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Zapisywanie..." : "Zapisz"}</Button>
+              <Button type="button" variant="outline" onClick={() => show("price_lists", record.id)}>
+                Anuluj
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Zapisywanie..." : "Zapisz"}
+              </Button>
             </FormActions>
           </Form>
         </CardContent>

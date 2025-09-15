@@ -1,3 +1,4 @@
+
 // ================================
 // path: src/pages/admin/pricelists/index.tsx
 // ================================
@@ -8,7 +9,7 @@ import { PricelistsEdit } from "./edit";
 import { PricelistsShow } from "./show";
 
 export const pricelistsResource = {
-  name: "pricelists",
+  name: "price_lists", // nazwa tabeli w DB / zasobu w dataProviderze
   list: "/admin/pricelists",
   create: "/admin/pricelists/create",
   edit: "/admin/pricelists/edit/:id",

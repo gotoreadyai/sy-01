@@ -1,3 +1,4 @@
+
 // ================================
 // path: src/pages/admin/pricelists/list.tsx
 // ================================
@@ -14,9 +15,12 @@ import { SubPage } from "@/components/layout";
 export const PricelistsList = () => {
   const {
     tableQuery: { data, isLoading, isError },
-    current, setCurrent, pageSize, setFilters,
+    current,
+    setCurrent,
+    pageSize,
+    setFilters,
   } = useTable({
-    resource: "pricelists",
+    resource: "price_lists",
     sorters: { initial: [{ field: "created_at", order: "desc" }] },
   });
   const { create, edit, show } = useNavigation();
@@ -27,12 +31,18 @@ export const PricelistsList = () => {
     <SubPage>
       <FlexBox>
         <Lead title="Cenniki" description="Wersje cenników" />
-        <Button onClick={() => create("pricelists")}><Plus className="w-4 h-4 mr-2" /> Nowa wersja</Button>
+        <Button onClick={() => create("price_lists")}>
+          <Plus className="w-4 h-4 mr-2" /> Nowa wersja
+        </Button>
       </FlexBox>
 
       <FlexBox>
-        <Input placeholder="Szukaj po nazwie..." className="max-w-sm"
-          onChange={(e) => setFilters([{ field: "name", operator: "contains", value: e.target.value }])}
+        <Input
+          placeholder="Szukaj po nazwie..."
+          className="max-w-sm"
+          onChange={(e) =>
+            setFilters([{ field: "title", operator: "contains", value: e.target.value }])
+          }
         />
       </FlexBox>
 
@@ -40,20 +50,22 @@ export const PricelistsList = () => {
         {data?.data?.map((p: any) => (
           <Card key={p.id}>
             <CardHeader>
-              <Lead title={p.name} description={p.version_label || "—"} variant="card" />
+              <Lead title={p.title} description={p.version_tag || "—"} variant="card" />
             </CardHeader>
             <CardContent>
               <div className="flex gap-2">
                 <Badge variant="outline">ID #{p.id}</Badge>
                 {p.branch_id && <Badge variant="outline">oddział #{p.branch_id}</Badge>}
-                {p.is_current && <Badge variant="secondary">aktywny</Badge>}
-                {p.is_archived && <Badge variant="destructive">archiwum</Badge>}
               </div>
             </CardContent>
             <CardFooter>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => show("pricelists", p.id)}><Eye className="w-4 h-4" /></Button>
-                <Button variant="outline" size="sm" onClick={() => edit("pricelists", p.id)}><Edit className="w-4 h-4" /></Button>
+                <Button variant="outline" size="sm" onClick={() => show("price_lists", p.id)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => edit("price_lists", p.id)}>
+                  <Edit className="w-4 h-4" />
+                </Button>
               </div>
             </CardFooter>
           </Card>
