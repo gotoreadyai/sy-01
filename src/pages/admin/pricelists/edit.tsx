@@ -1,11 +1,10 @@
 // ================================
-// path: src/pages/admin/vehicles/edit.tsx
+// path: src/pages/admin/pricelists/edit.tsx
 // ================================
 import { useForm } from "@refinedev/react-hook-form";
 import { useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button, Input } from "@/components/ui";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Button, Input, Textarea } from "@/components/ui";
 import { Form, FormActions, FormControl } from "@/components/form";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
@@ -14,18 +13,10 @@ import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"];
-
-export const VehiclesEdit = () => {
+export const PricelistsEdit = () => {
   const { show } = useNavigation();
-  const {
-    refineCore: { onFinish, queryResult },
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm({ refineCoreProps: { resource: "vehicles", action: "edit" } });
+  const { refineCore: { onFinish, queryResult }, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
+    useForm({ refineCoreProps: { resource: "pricelists", action: "edit" } });
 
   const isLoading = queryResult?.isLoading ?? true;
   const isError = queryResult?.isError ?? false;
@@ -37,13 +28,11 @@ export const VehiclesEdit = () => {
 
   return (
     <SubPage>
-      <Button variant="outline" size="sm" onClick={() => show("vehicles", record.id)}>
+      <Button variant="outline" size="sm" onClick={() => show("pricelists", record.id)}>
         <ArrowLeft className="w-4 h-4 mr-2" /> Powrót do szczegółów
       </Button>
 
-      <FlexBox>
-        <Lead title="Edycja pojazdu" description={`ID: #${String(record.id).slice(0,8)}`} />
-      </FlexBox>
+      <FlexBox><Lead title="Edycja cennika" description={`ID: #${record.id}`} /></FlexBox>
 
       <Card>
         <CardHeader><CardTitle>Parametry</CardTitle></CardHeader>
@@ -53,33 +42,36 @@ export const VehiclesEdit = () => {
               <FormControl label="Nazwa" htmlFor="name" error={errors.name?.message as string} required>
                 <Input id="name" {...register("name", { required: "Wymagane" })} />
               </FormControl>
-              <FormControl label="Typ" required>
-                <Select defaultValue={record.type} onValueChange={(v) => setValue("type", v)}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>
-                    {TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              <FormControl label="Oddział (opcjonalnie)">
+                <LookupSelect
+                  resource="branches"
+                  value={watch("branch_id") ?? record.branch_id}
+                  onChange={(v) => setValue("branch_id", Number(v))}
+                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
+                  placeholder="Globalny lub przypisany do oddziału"
+                />
               </FormControl>
             </GridBox>
 
             <GridBox variant="1-2-2">
-              <FormControl label="Oddział (branch_id)" required error={errors.branch_id?.message as string}>
-                <LookupSelect
-                  resource="branches"
-                  value={watch("branch_id") ?? record.branch_id}
-                  onChange={(v) => setValue("branch_id", Number(v), { shouldValidate: true })}
-                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
-                  placeholder="Wybierz oddział"
-                />
+              <FormControl label="Etykieta wersji" htmlFor="version_label">
+                <Input id="version_label" {...register("version_label")} />
               </FormControl>
-              <FormControl label="Tablica rejestracyjna" htmlFor="reg_plate">
-                <Input id="reg_plate" {...register("reg_plate")} />
+              <FormControl label="Ustaw jako aktywny">
+                <input type="checkbox" {...register("is_current")} />
               </FormControl>
             </GridBox>
 
+            <FormControl label="Treść cennika (rich-text)">
+              <Textarea rows={10} {...register("content")} />
+            </FormControl>
+
+            <FormControl label="Archiwum">
+              <input type="checkbox" {...register("is_archived")} />
+            </FormControl>
+
             <FormActions>
-              <Button type="button" variant="outline" onClick={() => show("vehicles", record.id)}>Anuluj</Button>
+              <Button type="button" variant="outline" onClick={() => show("pricelists", record.id)}>Anuluj</Button>
               <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Zapisywanie..." : "Zapisz"}</Button>
             </FormActions>
           </Form>

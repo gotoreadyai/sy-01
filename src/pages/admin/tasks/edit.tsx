@@ -12,6 +12,7 @@ import { FlexBox, GridBox } from "@/components/shared";
 import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
+import { LookupSelect } from "@/components/form/LookupSelect";
 
 const TYPES = ["transport", "plac"];
 const STATUSES = ["nowe", "w_realizacji", "zakonczone", "anulowane"];
@@ -23,10 +24,10 @@ export const TasksEdit = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ refineCoreProps: { resource: "tasks", action: "edit" } });
 
-  // ✅ bezpieczne wartości
   const isLoading = queryResult?.isLoading ?? true;
   const isError = queryResult?.isError ?? false;
   const record = queryResult?.data?.data as any | undefined;
@@ -34,6 +35,11 @@ export const TasksEdit = () => {
   const init = useLoading({ isLoading, isError });
   if (init) return init;
   if (!record) return null;
+
+  const onBranch = (v: string) => setValue("branch_id", Number(v), { shouldValidate: true });
+  const onVehicle = (v: string) => setValue("assigned_vehicle_id", Number(v));
+  const onContainer = (v: string) => setValue("assigned_container_id", Number(v));
+  const onDriver = (v: string) => setValue("assigned_driver", v);
 
   return (
     <SubPage>
@@ -68,8 +74,14 @@ export const TasksEdit = () => {
             </FormControl>
 
             <GridBox variant="1-2-2">
-              <FormControl label="Oddział (branch_id)" htmlFor="branch_id" required>
-                <Input id="branch_id" type="number" {...register("branch_id", { required: "Wymagane", valueAsNumber: true })} />
+              <FormControl label="Oddział (branch_id)" required error={errors.branch_id?.message as string}>
+                <LookupSelect
+                  resource="branches"
+                  value={watch("branch_id") ?? record.branch_id}
+                  onChange={onBranch}
+                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
+                  placeholder="Wybierz oddział"
+                />
               </FormControl>
               <FormControl label="Status" required>
                 <Select defaultValue={record.status} onValueChange={(v) => setValue("status", v)}>
@@ -92,13 +104,31 @@ export const TasksEdit = () => {
 
             <GridBox variant="1-2-2">
               <FormControl label="Kierowca (UUID)">
-                <Input {...register("assigned_driver")} />
+                <LookupSelect
+                  resource="users"
+                  value={watch("assigned_driver") ?? record.assigned_driver}
+                  onChange={onDriver}
+                  renderLabel={(u: any) => `${u.full_name || u.email} (#${String(u.id).slice(0, 8)})`}
+                  placeholder="Wybierz kierowcę (opcjonalnie)"
+                />
               </FormControl>
               <FormControl label="Pojazd (assigned_vehicle_id)">
-                <Input type="number" {...register("assigned_vehicle_id", { valueAsNumber: true })} />
+                <LookupSelect
+                  resource="vehicles"
+                  value={watch("assigned_vehicle_id") ?? record.assigned_vehicle_id}
+                  onChange={onVehicle}
+                  renderLabel={(v: any) => `${v.name}${v.reg_plate ? " / " + v.reg_plate : ""} (#${v.id})`}
+                  placeholder="Wybierz pojazd (opcjonalnie)"
+                />
               </FormControl>
               <FormControl label="Kontener (assigned_container_id)">
-                <Input type="number" {...register("assigned_container_id", { valueAsNumber: true })} />
+                <LookupSelect
+                  resource="containers"
+                  value={watch("assigned_container_id") ?? record.assigned_container_id}
+                  onChange={onContainer}
+                  renderLabel={(c: any) => `${c.code} [${c.status}]${c.category ? " / " + c.category : ""} (#${c.id})`}
+                  placeholder="Wybierz kontener (opcjonalnie)"
+                />
               </FormControl>
             </GridBox>
 

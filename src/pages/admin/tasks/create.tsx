@@ -11,6 +11,7 @@ import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
 import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
+import { LookupSelect } from "@/components/form/LookupSelect";
 
 const TYPES = ["transport", "plac"];
 const STATUSES = ["nowe", "w_realizacji", "zakonczone", "anulowane"];
@@ -23,10 +24,18 @@ export const TasksCreate = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ refineCoreProps: { resource: "tasks" } });
 
   const submit = (values: any) => onFinish({ ...values, created_by: me?.id });
+
+  const branchId = watch("branch_id");
+  const onBranch = (v: string) => setValue("branch_id", Number(v), { shouldValidate: true });
+
+  const onVehicle = (v: string) => setValue("assigned_vehicle_id", Number(v));
+  const onContainer = (v: string) => setValue("assigned_container_id", Number(v));
+  const onDriver = (v: string) => setValue("assigned_driver", v);
 
   return (
     <SubPage>
@@ -62,8 +71,14 @@ export const TasksCreate = () => {
             </FormControl>
 
             <GridBox variant="1-2-2">
-              <FormControl label="Oddział (branch_id)" htmlFor="branch_id" required>
-                <Input id="branch_id" type="number" {...register("branch_id", { required: "Wymagane", valueAsNumber: true })} />
+              <FormControl label="Oddział (branch_id)" required error={errors.branch_id?.message as string}>
+                <LookupSelect
+                  resource="branches"
+                  value={branchId}
+                  onChange={onBranch}
+                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
+                  placeholder="Wybierz oddział"
+                />
               </FormControl>
 
               <FormControl label="Status" required>
@@ -86,14 +101,34 @@ export const TasksCreate = () => {
             </GridBox>
 
             <GridBox variant="1-2-2">
-              <FormControl label="Kierowca (UUID)" htmlFor="assigned_driver">
-                <Input id="assigned_driver" {...register("assigned_driver")} />
+              <FormControl label="Kierowca (UUID)">
+                <LookupSelect
+                  resource="users"
+                  value={watch("assigned_driver")}
+                  onChange={onDriver}
+                  renderLabel={(u: any) => `${u.full_name || u.email} (#${String(u.id).slice(0, 8)})`}
+                  placeholder="Wybierz kierowcę (opcjonalnie)"
+                />
               </FormControl>
-              <FormControl label="Pojazd (assigned_vehicle_id)" htmlFor="assigned_vehicle_id">
-                <Input id="assigned_vehicle_id" type="number" {...register("assigned_vehicle_id", { valueAsNumber: true })} />
+
+              <FormControl label="Pojazd (assigned_vehicle_id)">
+                <LookupSelect
+                  resource="vehicles"
+                  value={watch("assigned_vehicle_id")}
+                  onChange={onVehicle}
+                  renderLabel={(v: any) => `${v.name}${v.reg_plate ? " / " + v.reg_plate : ""} (#${v.id})`}
+                  placeholder="Wybierz pojazd (opcjonalnie)"
+                />
               </FormControl>
-              <FormControl label="Kontener (assigned_container_id)" htmlFor="assigned_container_id">
-                <Input id="assigned_container_id" type="number" {...register("assigned_container_id", { valueAsNumber: true })} />
+
+              <FormControl label="Kontener (assigned_container_id)">
+                <LookupSelect
+                  resource="containers"
+                  value={watch("assigned_container_id")}
+                  onChange={onContainer}
+                  renderLabel={(c: any) => `${c.code} [${c.status}]${c.category ? " / " + c.category : ""} (#${c.id})`}
+                  placeholder="Wybierz kontener (opcjonalnie)"
+                />
               </FormControl>
             </GridBox>
 

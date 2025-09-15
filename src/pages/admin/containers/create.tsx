@@ -1,11 +1,10 @@
 // ================================
-// path: src/pages/admin/vehicles/create.tsx
+// path: src/pages/admin/containers/create.tsx
 // ================================
 import { useForm } from "@refinedev/react-hook-form";
 import { useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button, Input } from "@/components/ui";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Button, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
 import { Form, FormActions, FormControl } from "@/components/form";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
@@ -13,38 +12,31 @@ import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"];
+const STATUSES = ["na_placu", "u_klienta", "na_samochodzie", "serwis", "inne"] as const;
 
-export const VehiclesCreate = () => {
+export const ContainersCreate = () => {
   const { list } = useNavigation();
   const { refineCore: { onFinish }, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
-    useForm({ refineCoreProps: { resource: "vehicles" } });
+    useForm({ refineCoreProps: { resource: "containers" } });
 
   return (
     <SubPage>
-      <Button variant="outline" size="sm" onClick={() => list("vehicles")}>
+      <Button variant="outline" size="sm" onClick={() => list("containers")}>
         <ArrowLeft className="w-4 h-4 mr-2" /> Powrót do listy
       </Button>
 
-      <FlexBox>
-        <Lead title="Nowy pojazd" description="Dodaj pojazd" />
-      </FlexBox>
+      <FlexBox><Lead title="Nowy kontener" description="Dodaj kontener" /></FlexBox>
 
       <Card>
         <CardHeader><CardTitle>Parametry</CardTitle></CardHeader>
         <CardContent>
           <Form onSubmit={handleSubmit(onFinish)}>
             <GridBox variant="1-2-2">
-              <FormControl label="Nazwa" htmlFor="name" error={errors.name?.message as string} required>
-                <Input id="name" {...register("name", { required: "Wymagane" })} />
+              <FormControl label="Kod / numer" htmlFor="code" error={errors.code?.message as string} required>
+                <Input id="code" {...register("code", { required: "Wymagane" })} />
               </FormControl>
-              <FormControl label="Typ" required>
-                <Select onValueChange={(v) => setValue("type", v)}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>
-                    {TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              <FormControl label="Kategoria" htmlFor="category">
+                <Input id="category" {...register("category")} />
               </FormControl>
             </GridBox>
 
@@ -58,13 +50,28 @@ export const VehiclesCreate = () => {
                   placeholder="Wybierz oddział"
                 />
               </FormControl>
-              <FormControl label="Tablica rejestracyjna" htmlFor="reg_plate">
-                <Input id="reg_plate" {...register("reg_plate")} />
+              <FormControl label="Tara [kg]" htmlFor="tare_kg">
+                <Input id="tare_kg" type="number" step="1" {...register("tare_kg", { valueAsNumber: true })} />
               </FormControl>
             </GridBox>
 
+            <FormControl label="Status">
+              <Select onValueChange={(v) => setValue("status", v)}>
+                <SelectTrigger><SelectValue placeholder="Wybierz status" /></SelectTrigger>
+                <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              </Select>
+            </FormControl>
+
+            <FormControl label="Notatki serwisowe">
+              <Textarea rows={3} {...register("service_notes")} />
+            </FormControl>
+
+            <FormControl label="Archiwum">
+              <input type="checkbox" {...register("is_archived")} />
+            </FormControl>
+
             <FormActions>
-              <Button type="button" variant="outline" onClick={() => list("vehicles")}>Anuluj</Button>
+              <Button type="button" variant="outline" onClick={() => list("containers")}>Anuluj</Button>
               <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Tworzenie..." : "Utwórz"}</Button>
             </FormActions>
           </Form>

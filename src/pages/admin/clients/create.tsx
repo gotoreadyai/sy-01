@@ -11,6 +11,7 @@ import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
 import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
+import { LookupSelect } from "@/components/form/LookupSelect";
 
 const SECTIONS = ["zakupy", "sprzedaz", "firmy_transportowe", "inne"];
 
@@ -21,8 +22,11 @@ export const ClientsCreate = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ refineCoreProps: { resource: "clients" } });
+
+  const onBranch = (v: string) => setValue("branch_id", Number(v));
 
   return (
     <SubPage>
@@ -57,7 +61,13 @@ export const ClientsCreate = () => {
                 <Input id="category" {...register("category")} />
               </FormControl>
               <FormControl label="Oddział (branch_id)" htmlFor="branch_id">
-                <Input id="branch_id" type="number" {...register("branch_id", { valueAsNumber: true })} />
+                <LookupSelect
+                  resource="branches"
+                  value={watch("branch_id")}
+                  onChange={onBranch}
+                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
+                  placeholder="Wybierz oddział (opcjonalnie)"
+                />
               </FormControl>
             </GridBox>
 
