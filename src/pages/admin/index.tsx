@@ -15,11 +15,14 @@ import { vehiclesChildRoutes } from "./vehicles";
 import { branchesChildRoutes } from "./branches";
 import { clientsChildRoutes } from "./clients";
 import { usersChildRoutes } from "./users";
-
-// ⬇️ nowe moduły
 import { containersChildRoutes } from "./containers";
 import { calendarChildRoutes } from "./calendar";
 import { pricelistsChildRoutes } from "./pricelists";
+import { equipmentChildRoutes } from "./equipment";
+import { haulsChildRoutes } from "./hauls";
+import { maintenancesChildRoutes } from "./maintenances";
+import { vacationsChildRoutes } from "./vacations";
+import { reportsChildRoutes } from "./reports";
 
 const AdminRoutes = () => (
   <Routes>
@@ -33,10 +36,14 @@ const AdminRoutes = () => (
       <Route path="vehicles">{vehiclesChildRoutes}</Route>
       <Route path="clients">{clientsChildRoutes}</Route>
 
-      {/* nowe */}
       <Route path="containers">{containersChildRoutes}</Route>
       <Route path="calendar">{calendarChildRoutes}</Route>
       <Route path="pricelists">{pricelistsChildRoutes}</Route>
+      <Route path="equipment">{equipmentChildRoutes}</Route>
+      <Route path="hauls">{haulsChildRoutes}</Route>
+      <Route path="maintenances">{maintenancesChildRoutes}</Route>
+      <Route path="vacations">{vacationsChildRoutes}</Route>
+      <Route path="reports">{reportsChildRoutes}</Route>
 
       <Route path="*" element={<Navigate to="/admin/dashboard/overview" replace />} />
     </Route>
