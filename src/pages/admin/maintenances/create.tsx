@@ -13,8 +13,8 @@ import { FlexBox, GridBox } from "@/components/shared";
 import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { LookupSelect } from "@/components/form/LookupSelect";
-import { ASSET_TYPES, MAINT_TYPES } from "./shared";
-import { RES } from "./index";
+import { RES_LIST, RES_WRITE } from "./index";
+import { SERVICE_KINDS } from "./shared";
 
 export const MaintenancesCreate = () => {
   const { list } = useNavigation();
@@ -24,28 +24,19 @@ export const MaintenancesCreate = () => {
     refineCore: { onFinish },
     register, handleSubmit, setValue, watch,
     formState: { errors, isSubmitting },
-  } = useForm({ refineCoreProps: { resource: RES } });
+  } = useForm({ refineCoreProps: { resource: RES_WRITE } });
 
   React.useEffect(() => {
     const qs = new URLSearchParams(location.search);
-    const asset_type = qs.get("asset_type");
     const asset_id = qs.get("asset_id");
-    const type = qs.get("type");
-    const title = qs.get("title");
-    if (asset_type) setValue("asset_type", asset_type, { shouldValidate: true });
+    const kind = qs.get("kind");
     if (asset_id) setValue("asset_id", Number(asset_id), { shouldValidate: true });
-    if (type) setValue("type", type, { shouldValidate: true });
-    if (title) setValue("title", title, { shouldValidate: false });
+    if (kind) setValue("kind", kind, { shouldValidate: true });
   }, [location.search, setValue]);
-
-  const onAssetType = (v: string) => {
-    setValue("asset_type", v, { shouldValidate: true });
-    setValue("asset_id", undefined);
-  };
 
   return (
     <SubPage>
-      <Button variant="outline" size="sm" onClick={() => list(RES)}>
+      <Button variant="outline" size="sm" onClick={() => list(RES_LIST)}>
         <ArrowLeft className="w-4 h-4 mr-2" /> Powrót do listy
       </Button>
 
@@ -55,53 +46,22 @@ export const MaintenancesCreate = () => {
         <CardHeader><CardTitle>Parametry</CardTitle></CardHeader>
         <CardContent>
           <Form onSubmit={handleSubmit(onFinish)}>
-            <input type="hidden" {...register("type", { required: "Wymagane" })} />
-            <input type="hidden" {...register("asset_type", { required: "Wymagane" })} />
-            <input type="hidden" {...register("asset_id", { required: "Wymagane" })} />
-
-            <FormControl label="Tytuł" htmlFor="title" error={errors.title?.message as string} required>
-              <Input id="title" {...register("title", { required: "Wymagane" })} />
-            </FormControl>
-
             <GridBox variant="1-2-2">
-              <FormControl label="Typ" required error={errors.type?.message as string}>
-                <Select defaultValue={watch("type")} onValueChange={(v) => setValue("type", v, { shouldValidate: true })}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>{MAINT_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
-              </FormControl>
-
-              <FormControl label="Oddział (opcjonalnie)">
+              <FormControl label="Zasób (assets)" required error={errors.asset_id?.message as string}>
                 <LookupSelect
-                  resource="branches"
-                  value={watch("branch_id")}
-                  onChange={(v) => setValue("branch_id", Number(v))}
-                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
-                  placeholder="Globalny lub przypisany do oddziału"
-                />
-              </FormControl>
-            </GridBox>
-
-            <GridBox variant="1-2-2">
-              <FormControl label="Zasób – typ" required error={errors.asset_type?.message as string}>
-                <Select defaultValue={watch("asset_type")} onValueChange={onAssetType}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz zasób" /></SelectTrigger>
-                  <SelectContent>{ASSET_TYPES.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
-                </Select>
-              </FormControl>
-
-              <FormControl label="Zasób – ID" required error={errors.asset_id?.message as string}>
-                <LookupSelect
-                  resource={
-                    watch("asset_type") === "vehicle"   ? "vehicles"   :
-                    watch("asset_type") === "container" ? "containers" :
-                    "yard_equipment"
-                  }
+                  resource="assets"
                   value={watch("asset_id")}
                   onChange={(v) => setValue("asset_id", Number(v), { shouldValidate: true })}
-                  renderLabel={(x: any) => `${x.name || x.code} (#${x.id})`}
-                  placeholder="Wybierz zasób po typie"
+                  renderLabel={(x: any) => `${x.label} [${x.kind}] (#${x.id})`}
+                  placeholder="Wybierz zasób"
                 />
+              </FormControl>
+
+              <FormControl label="Typ serwisu" required error={errors.kind?.message as string}>
+                <Select defaultValue={watch("kind")} onValueChange={(v) => setValue("kind", v, { shouldValidate: true })}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
+                  <SelectContent>{SERVICE_KINDS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
               </FormControl>
             </GridBox>
 
@@ -109,8 +69,8 @@ export const MaintenancesCreate = () => {
               <FormControl label="Termin (due_at)" htmlFor="due_at">
                 <Input id="due_at" type="date" {...register("due_at")} />
               </FormControl>
-              <FormControl label="Wykonano (completed_at)" htmlFor="completed_at">
-                <Input id="completed_at" type="date" {...register("completed_at")} />
+              <FormControl label="Wykonano (done_at)" htmlFor="done_at">
+                <Input id="done_at" type="date" {...register("done_at")} />
               </FormControl>
             </GridBox>
 
@@ -119,7 +79,7 @@ export const MaintenancesCreate = () => {
             </FormControl>
 
             <FormActions>
-              <Button type="button" variant="outline" onClick={() => list(RES)}>Anuluj</Button>
+              <Button type="button" variant="outline" onClick={() => list(RES_LIST)}>Anuluj</Button>
               <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Tworzenie..." : "Utwórz"}</Button>
             </FormActions>
           </Form>

@@ -5,7 +5,7 @@ import React from "react";
 import { useForm } from "@refinedev/react-hook-form";
 import { useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, Textarea } from "@/components/ui";
+import { Button, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
 import { Form, FormActions, FormControl } from "@/components/form";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
@@ -48,14 +48,12 @@ export const EquipmentEdit = () => {
         <CardHeader><CardTitle>Dane podstawowe</CardTitle></CardHeader>
         <CardContent>
           <Form onSubmit={handleSubmit(onFinish)}>
-            {/* ukryte pole do przesłania wartości z Selecta */}
             <input type="hidden" {...register("is_archived")} />
 
             <GridBox variant="1-2-2">
               <FormControl label="Nazwa" htmlFor="name" error={errors.name?.message as string} required>
                 <Input id="name" {...register("name", { required: "Wymagane" })} />
               </FormControl>
-
               <FormControl label="Kategoria (type)" required>
                 <Select defaultValue={record.type} onValueChange={(v) => setValue("type", v, { shouldValidate: true })}>
                   <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
@@ -80,20 +78,14 @@ export const EquipmentEdit = () => {
                   defaultValue={record.is_archived ? "archiwum" : "dostepny"}
                   onValueChange={(v) => {
                     const opt = STATUS.find((s) => s.value === v);
-                    setValue("is_archived", opt?.archived ?? false, { shouldValidate: true });
+                    setValue("is_archived", !!opt?.archived, { shouldValidate: true });
                   }}
                 >
                   <SelectTrigger><SelectValue placeholder="Wybierz status" /></SelectTrigger>
-                  <SelectContent>
-                    {STATUS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                  </SelectContent>
+                  <SelectContent>{STATUS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                 </Select>
               </FormControl>
             </GridBox>
-
-            <FormControl label="Notatki serwisowe">
-              <Textarea rows={3} {...register("service_notes")} />
-            </FormControl>
 
             <FormActions>
               <Button type="button" variant="outline" onClick={() => show("yard_equipment", record.id)}>Anuluj</Button>

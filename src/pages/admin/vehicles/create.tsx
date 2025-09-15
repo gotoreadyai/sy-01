@@ -13,7 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"];
+const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"] as const;
 
 export const VehiclesCreate = () => {
   const { list } = useNavigation();
@@ -41,9 +41,7 @@ export const VehiclesCreate = () => {
               <FormControl label="Typ" required>
                 <Select onValueChange={(v) => setValue("type", v)}>
                   <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>
-                    {TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
+                  <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </FormControl>
             </GridBox>
@@ -58,10 +56,14 @@ export const VehiclesCreate = () => {
                   placeholder="Wybierz oddział"
                 />
               </FormControl>
-              <FormControl label="Tablica rejestracyjna" htmlFor="reg_plate">
+              <FormControl label="Rejestracja" htmlFor="reg_plate">
                 <Input id="reg_plate" {...register("reg_plate")} />
               </FormControl>
             </GridBox>
+
+            <FormControl label="VIN" htmlFor="vin">
+              <Input id="vin" {...register("vin")} />
+            </FormControl>
 
             <FormActions>
               <Button type="button" variant="outline" onClick={() => list("vehicles")}>Anuluj</Button>

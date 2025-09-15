@@ -12,7 +12,7 @@ import { PaginationSwith } from "@/components/navigation";
 import { SubPage } from "@/components/layout";
 import React from "react";
 
-const STATUSES = ["na_placu", "u_klienta", "na_samochodzie", "serwis", "inne"] as const;
+const STATUSES = ["na_placu", "u_klienta", "na_pojezdzie", "serwis", "inne"] as const;
 
 export const ContainersList: React.FC = () => {
   const {
@@ -70,7 +70,7 @@ export const ContainersList: React.FC = () => {
               <FlexBox variant="start" className="gap-2">
                 <Badge variant="outline">ID #{c.id}</Badge>
                 {c.status && <Badge variant="secondary">{c.status}</Badge>}
-                {typeof c.tare_kg === "number" && <Badge variant="outline">{c.tare_kg} kg tara</Badge>}
+                {typeof c.tara_kg === "number" && <Badge variant="outline">{c.tara_kg} kg tara</Badge>}
                 {c.branch_id && <Badge variant="outline">oddział #{c.branch_id}</Badge>}
                 {c.is_archived && <Badge variant="destructive">archiwum</Badge>}
               </FlexBox>

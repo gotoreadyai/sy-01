@@ -11,18 +11,19 @@ import { FlexBox } from "@/components/shared";
 import { ArrowLeft, Edit, Plus, Wrench, CheckCircle } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
-import { RES as MAINT_RES } from "../maintenances/index";
 
 type Equipment = {
   id: number;
+  asset_id: number;
   name: string;
   type: string;
   branch_id: number;
-  service_notes?: string | null;
   is_archived?: boolean;
   created_at?: string;
   updated_at?: string;
 };
+
+const MAINT_RES = "asset_maintenances" as const;
 
 export const EquipmentShow = () => {
   const { queryResult } = useShow<Equipment>({ resource: "yard_equipment" });
@@ -33,31 +34,26 @@ export const EquipmentShow = () => {
   const isError = queryResult?.isError ?? false;
   const record = queryResult?.data?.data;
 
+  // Hook ZAWSZE wywołany; odpali zapytanie dopiero po załadowaniu rekordu
+  const maintQuery = useList({
+    resource: MAINT_RES,
+    filters: record ? [{ field: "asset_id", operator: "eq", value: record.asset_id }] : [],
+    sorters: [{ field: "due_at", order: "asc" }],
+    pagination: { current: 1, pageSize: 100 },
+    queryOptions: { enabled: !!record },
+  });
+  const maints = (maintQuery.data?.data as any[]) ?? [];
+  const nextDue = maints
+    .filter((m) => !m.done_at && m.due_at)
+    .sort((a, b) => +new Date(a.due_at) - +new Date(b.due_at))[0];
+  const activeIssues = maints.filter((m) => m.service_kind === "usterka" && !m.done_at);
+  const historyRepairs = maints
+    .filter((m) => m.done_at && ["naprawa", "usterka", "inne"].includes(m.service_kind))
+    .sort((a, b) => +new Date(b.done_at) - +new Date(a.done_at));
+
   const init = useLoading({ isLoading, isError });
   if (init) return init;
   if (!record) return null;
-
-  // Pobranie powiązanych wpisów serwisowych
-  const maintQuery = useList({
-    resource: MAINT_RES,
-    filters: [
-      { field: "asset_type", operator: "eq", value: "equipment" },
-      { field: "asset_id", operator: "eq", value: record.id },
-    ],
-    sorters: [{ field: "due_at", order: "asc" }],
-    pagination: { current: 1, pageSize: 100 }, // prosta książka serwisowa
-  });
-
-  const maints = (maintQuery.data?.data as any[]) ?? [];
-
-  const nextDue = maints
-    .filter((m) => !m.completed_at && m.due_at)
-    .sort((a, b) => (new Date(a.due_at).getTime() - new Date(b.due_at).getTime()))[0];
-
-  const activeIssues = maints.filter((m) => m.type === "usterka" && !m.completed_at);
-  const historyRepairs = maints
-    .filter((m) => !!m.completed_at && (m.type === "naprawa" || m.type === "usterka" || m.type === "inne"))
-    .sort((a, b) => (new Date(b.completed_at!).getTime() - new Date(a.completed_at!).getTime()));
 
   return (
     <SubPage>
@@ -73,13 +69,25 @@ export const EquipmentShow = () => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate(`/admin/maintenances/create?asset_type=equipment&asset_id=${record.id}&type=usterka&title=${encodeURIComponent(`Usterka: ${record.name}`)}`)}
+            onClick={() =>
+              navigate(
+                `/admin/maintenances/create?asset_type=equipment&asset_id=${record.asset_id}&type=usterka&title=${encodeURIComponent(
+                  `Usterka: ${record.name}`,
+                )}`,
+              )
+            }
           >
             <Wrench className="w-4 h-4 mr-2" /> Zgłoś usterkę
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate(`/admin/maintenances/create?asset_type=equipment&asset_id=${record.id}&title=${encodeURIComponent(`Wpis serwisowy: ${record.name}`)}`)}
+            onClick={() =>
+              navigate(
+                `/admin/maintenances/create?asset_type=equipment&asset_id=${record.asset_id}&title=${encodeURIComponent(
+                  `Wpis serwisowy: ${record.name}`,
+                )}`,
+              )
+            }
           >
             <Plus className="w-4 h-4 mr-2" /> Dodaj wpis
           </Button>
@@ -100,7 +108,6 @@ export const EquipmentShow = () => {
           </div>
           <Separator />
           <div className="text-sm space-y-1">
-            {record.service_notes && <div><b>Serwis:</b> {record.service_notes}</div>}
             {record.created_at && <div><b>Utworzono:</b> {new Date(record.created_at).toLocaleString()}</div>}
             {record.updated_at && <div><b>Aktualizacja:</b> {new Date(record.updated_at).toLocaleString()}</div>}
           </div>
@@ -111,17 +118,12 @@ export const EquipmentShow = () => {
       <Card className="mt-4">
         <CardHeader><CardTitle>Książka serwisowa</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          {/* Terminy */}
-          <div>
-            <div className="font-medium mb-1">Terminy</div>
-            <div className="text-sm">
-              <b>Następny przegląd:</b>{" "}
-              {nextDue?.due_at ? new Date(nextDue.due_at).toLocaleDateString() : "—"}
-            </div>
+          <div className="text-sm">
+            <b>Następny przegląd:</b>{" "}
+            {nextDue?.due_at ? new Date(nextDue.due_at).toLocaleDateString() : "—"}
           </div>
           <Separator />
 
-          {/* Aktywne zgłoszenia usterek */}
           <div>
             <div className="font-medium mb-2">Aktywne zgłoszenia usterek</div>
             {activeIssues.length === 0 ? (
@@ -129,21 +131,19 @@ export const EquipmentShow = () => {
             ) : (
               <div className="space-y-3">
                 {activeIssues.map((i) => (
-                  <div key={i.id} className="border rounded-lg p-3">
+                  <div key={i.service_id} className="border rounded-lg p-3">
                     <div className="flex items-center justify-between">
-                      <div className="font-medium">{i.title}</div>
+                      <div className="font-medium">{i.service_kind}</div>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => navigate(`/admin/maintenances/edit/${i.id}`)}
+                        onClick={() => navigate(`/admin/maintenances/edit/${i.service_id}`)}
                       >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Zrealizuj naprawę
+                        <CheckCircle className="w-4 h-4 mr-2" /> Zakończ
                       </Button>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Zgłoszono: {i.created_at ? new Date(i.created_at).toLocaleString() : "—"}
-                      {/* Jeśli masz autora w bazie, można tu dodać „przez ...” */}
                     </div>
                     {i.notes && <div className="text-sm mt-2">{i.notes}</div>}
                   </div>
@@ -153,14 +153,19 @@ export const EquipmentShow = () => {
           </div>
           <Separator />
 
-          {/* Historia napraw */}
           <div>
             <div className="flex items-center justify-between">
               <div className="font-medium">Historia napraw</div>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => navigate(`/admin/maintenances/create?asset_type=equipment&asset_id=${record.id}&type=naprawa&title=${encodeURIComponent("Naprawa – " + record.name)}`)}
+                onClick={() =>
+                  navigate(
+                    `/admin/maintenances/create?asset_type=equipment&asset_id=${record.asset_id}&type=naprawa&title=${encodeURIComponent(
+                      "Naprawa – " + record.name,
+                    )}`,
+                  )
+                }
               >
                 <Plus className="w-4 h-4 mr-2" /> Dodaj wpis
               </Button>
@@ -170,10 +175,10 @@ export const EquipmentShow = () => {
             ) : (
               <div className="space-y-3 mt-2">
                 {historyRepairs.map((h) => (
-                  <div key={h.id} className="border rounded-lg p-3">
-                    <div className="font-medium">{h.title}</div>
+                  <div key={h.service_id} className="border rounded-lg p-3">
+                    <div className="font-medium">{h.service_kind}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {h.completed_at ? new Date(h.completed_at).toLocaleDateString() : "—"}
+                      {h.done_at ? new Date(h.done_at).toLocaleDateString() : "—"}
                     </div>
                     {h.notes && <div className="text-sm mt-2">{h.notes}</div>}
                   </div>

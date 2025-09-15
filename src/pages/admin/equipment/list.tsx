@@ -43,65 +43,43 @@ export const EquipmentList: React.FC = () => {
       </FlexBox>
 
       <FlexBox className="gap-3">
-        <Input
-          placeholder="Szukaj po nazwie…"
-          className="max-w-sm"
-          onChange={(e) => onSearch(e.target.value)}
-        />
+        <Input placeholder="Szukaj po nazwie…" className="max-w-sm" onChange={(e) => onSearch(e.target.value)} />
       </FlexBox>
 
       <GridBox>
         {data?.data?.map((e: any) => (
           <Card key={e.id}>
             <CardHeader>
-              <Lead
-                title={e.name}
-                description={e.service_notes || "—"}
-                variant="card"
-              />
+              <Lead title={e.name} description="—" variant="card" />
             </CardHeader>
             <CardContent>
               <FlexBox variant="start" className="gap-2">
                 <Badge variant="outline">ID #{e.id}</Badge>
                 {e.type && <Badge variant="secondary">{e.type}</Badge>}
                 {e.branch_id && <Badge variant="outline">oddział #{e.branch_id}</Badge>}
-                {e.is_archived ? (
-                  <Badge variant="destructive">archiwum</Badge>
-                ) : (
-                  <Badge variant="outline">dostępny</Badge>
-                )}
+                {e.is_archived ? <Badge variant="destructive">archiwum</Badge> : <Badge variant="outline">dostępny</Badge>}
               </FlexBox>
             </CardContent>
             <CardFooter>
               <FlexBox variant="start" className="gap-2">
-                <Button variant="outline" size="sm" onClick={() => show("yard_equipment", e.id)}>
-                  <Eye className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => edit("yard_equipment", e.id)}>
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    navigate(`/admin/maintenances/create?asset_type=equipment&asset_id=${e.id}&type=usterka&title=${encodeURIComponent(`Usterka: ${e.name}`)}`)
-                  }
-                >
-                  <Wrench className="w-4 h-4 mr-1" /> Zgłoś usterkę
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => show("yard_equipment", e.id)}><Eye className="w-4 h-4" /></Button>
+                <Button variant="outline" size="sm" onClick={() => edit("yard_equipment", e.id)}><Edit className="w-4 h-4" /></Button>
+                {e.asset_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/admin/maintenances/create?asset_id=${e.asset_id}&kind=usterka`)}
+                  >
+                    <Wrench className="w-4 h-4 mr-1" /> Zgłoś usterkę
+                  </Button>
+                )}
               </FlexBox>
             </CardFooter>
           </Card>
         ))}
       </GridBox>
 
-      <PaginationSwith
-        current={current}
-        pageSize={pageSize}
-        total={data?.total || 0}
-        setCurrent={setCurrent}
-        itemName="pozycje"
-      />
+      <PaginationSwith current={current} pageSize={pageSize} total={data?.total || 0} setCurrent={setCurrent} itemName="pozycje" />
     </SubPage>
   );
 };

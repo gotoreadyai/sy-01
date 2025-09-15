@@ -4,7 +4,7 @@
 import { useForm } from "@refinedev/react-hook-form";
 import { useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
+import { Button, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
 import { Form, FormActions, FormControl } from "@/components/form";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
@@ -12,12 +12,15 @@ import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const STATUSES = ["na_placu", "u_klienta", "na_samochodzie", "serwis", "inne"] as const;
+const STATUSES = ["na_placu", "u_klienta", "na_pojezdzie", "serwis", "inne"] as const;
 
 export const ContainersCreate = () => {
   const { list } = useNavigation();
-  const { refineCore: { onFinish }, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
-    useForm({ refineCoreProps: { resource: "containers" } });
+  const {
+    refineCore: { onFinish },
+    register, handleSubmit, setValue, watch,
+    formState: { errors, isSubmitting },
+  } = useForm({ refineCoreProps: { resource: "containers" } });
 
   return (
     <SubPage>
@@ -50,8 +53,8 @@ export const ContainersCreate = () => {
                   placeholder="Wybierz oddział"
                 />
               </FormControl>
-              <FormControl label="Tara [kg]" htmlFor="tare_kg">
-                <Input id="tare_kg" type="number" step="1" {...register("tare_kg", { valueAsNumber: true })} />
+              <FormControl label="Tara [kg]" htmlFor="tara_kg">
+                <Input id="tara_kg" type="number" step="1" {...register("tara_kg", { valueAsNumber: true })} />
               </FormControl>
             </GridBox>
 
@@ -60,10 +63,6 @@ export const ContainersCreate = () => {
                 <SelectTrigger><SelectValue placeholder="Wybierz status" /></SelectTrigger>
                 <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
-            </FormControl>
-
-            <FormControl label="Notatki serwisowe">
-              <Textarea rows={3} {...register("service_notes")} />
             </FormControl>
 
             <FormControl label="Archiwum">

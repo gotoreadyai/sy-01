@@ -13,8 +13,8 @@ import { ArrowLeft } from "lucide-react";
 import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
 import { LookupSelect } from "@/components/form/LookupSelect";
-import { ASSET_TYPES, MAINT_TYPES } from "./shared";
-import { RES } from "./index";
+import { RES_LIST, RES_WRITE } from "./index";
+import { SERVICE_KINDS } from "./shared";
 
 export const MaintenancesEdit = () => {
   const { show } = useNavigation();
@@ -22,7 +22,7 @@ export const MaintenancesEdit = () => {
     refineCore: { onFinish, queryResult },
     register, handleSubmit, setValue, watch,
     formState: { errors, isSubmitting },
-  } = useForm({ refineCoreProps: { resource: RES, action: "edit" } });
+  } = useForm({ refineCoreProps: { resource: RES_WRITE, action: "edit" } });
 
   const isLoading = queryResult?.isLoading ?? true;
   const isError = queryResult?.isError ?? false;
@@ -31,70 +31,34 @@ export const MaintenancesEdit = () => {
   if (init) return init;
   if (!record) return null;
 
-  const onAssetType = (v: string) => {
-    setValue("asset_type", v, { shouldValidate: true });
-    setValue("asset_id", undefined);
-  };
-
   return (
     <SubPage>
-      <Button variant="outline" size="sm" onClick={() => show(RES, record.id)}>
+      <Button variant="outline" size="sm" onClick={() => show(RES_LIST, record.id)}>
         <ArrowLeft className="w-4 h-4 mr-2" /> Powrót do szczegółów
       </Button>
 
-      <FlexBox><Lead title="Edycja wpisu serwisowego" description={`ID: #${record.id}`} /></FlexBox>
+      <FlexBox><Lead title="Edycja wpisu serwisowego" description={`SID: #${record.id}`} /></FlexBox>
 
       <Card>
         <CardHeader><CardTitle>Parametry</CardTitle></CardHeader>
         <CardContent>
           <Form onSubmit={handleSubmit(onFinish)}>
-            <input type="hidden" {...register("type", { required: "Wymagane" })} />
-            <input type="hidden" {...register("asset_type", { required: "Wymagane" })} />
-            <input type="hidden" {...register("asset_id", { required: "Wymagane" })} />
-
-            <FormControl label="Tytuł" htmlFor="title" error={errors.title?.message as string} required>
-              <Input id="title" {...register("title", { required: "Wymagane" })} />
-            </FormControl>
-
             <GridBox variant="1-2-2">
-              <FormControl label="Typ" required error={errors.type?.message as string}>
-                <Select defaultValue={record.type} onValueChange={(v) => setValue("type", v, { shouldValidate: true })}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>{MAINT_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
-              </FormControl>
-
-              <FormControl label="Oddział (opcjonalnie)">
+              <FormControl label="Zasób (assets)" required error={errors.asset_id?.message as string}>
                 <LookupSelect
-                  resource="branches"
-                  value={watch("branch_id") ?? record.branch_id}
-                  onChange={(v) => setValue("branch_id", Number(v))}
-                  renderLabel={(b: any) => `${b.name}${b.city ? " — " + b.city : ""} (#${b.id})`}
-                  placeholder="Globalny lub przypisany do oddziału"
-                />
-              </FormControl>
-            </GridBox>
-
-            <GridBox variant="1-2-2">
-              <FormControl label="Zasób – typ" required error={errors.asset_type?.message as string}>
-                <Select defaultValue={record.asset_type} onValueChange={onAssetType}>
-                  <SelectTrigger><SelectValue placeholder="Wybierz zasób" /></SelectTrigger>
-                  <SelectContent>{ASSET_TYPES.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
-                </Select>
-              </FormControl>
-
-              <FormControl label="Zasób – ID" required error={errors.asset_id?.message as string}>
-                <LookupSelect
-                  resource={
-                    (watch("asset_type") ?? record.asset_type) === "vehicle"   ? "vehicles"   :
-                    (watch("asset_type") ?? record.asset_type) === "container" ? "containers" :
-                    "yard_equipment"
-                  }
+                  resource="assets"
                   value={watch("asset_id") ?? record.asset_id}
                   onChange={(v) => setValue("asset_id", Number(v), { shouldValidate: true })}
-                  renderLabel={(x: any) => `${x.name || x.code} (#${x.id})`}
-                  placeholder="Wybierz zasób po typie"
+                  renderLabel={(x: any) => `${x.label} [${x.kind}] (#${x.id})`}
+                  placeholder="Wybierz zasób"
                 />
+              </FormControl>
+
+              <FormControl label="Typ serwisu" required error={errors.kind?.message as string}>
+                <Select defaultValue={record.kind} onValueChange={(v) => setValue("kind", v, { shouldValidate: true })}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
+                  <SelectContent>{SERVICE_KINDS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
               </FormControl>
             </GridBox>
 
@@ -102,8 +66,8 @@ export const MaintenancesEdit = () => {
               <FormControl label="Termin (due_at)" htmlFor="due_at">
                 <Input id="due_at" type="date" {...register("due_at")} />
               </FormControl>
-              <FormControl label="Wykonano (completed_at)" htmlFor="completed_at">
-                <Input id="completed_at" type="date" {...register("completed_at")} />
+              <FormControl label="Wykonano (done_at)" htmlFor="done_at">
+                <Input id="done_at" type="date" {...register("done_at")} />
               </FormControl>
             </GridBox>
 
@@ -112,7 +76,7 @@ export const MaintenancesEdit = () => {
             </FormControl>
 
             <FormActions>
-              <Button type="button" variant="outline" onClick={() => show(RES, record.id)}>Anuluj</Button>
+              <Button type="button" variant="outline" onClick={() => show(RES_LIST, record.id)}>Anuluj</Button>
               <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Zapisywanie..." : "Zapisz"}</Button>
             </FormActions>
           </Form>

@@ -1,15 +1,16 @@
 // ================================
-// path: src/pages/vehicles/list.tsx
+// path: src/pages/admin/vehicles/list.tsx
 // ================================
 import { useTable, useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge, Button, Input } from "@/components/ui";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
-import { Eye, Edit, Plus } from "lucide-react";
+import { Eye, Edit, Plus, Wrench } from "lucide-react";
 import { useLoading } from "@/utility";
 import { PaginationSwith } from "@/components/navigation";
 import { SubPage } from "@/components/layout";
+import { useNavigate } from "react-router-dom";
 
 export const VehiclesList = () => {
   const {
@@ -20,6 +21,7 @@ export const VehiclesList = () => {
     sorters: { initial: [{ field: "created_at", order: "desc" }] },
   });
   const { create, edit, show } = useNavigation();
+  const navigate = useNavigate();
   const init = useLoading({ isLoading, isError });
   if (init) return init;
 
@@ -53,25 +55,24 @@ export const VehiclesList = () => {
             </CardContent>
             <CardFooter>
               <FlexBox variant="start" className="gap-2">
-                <Button variant="outline" size="sm" onClick={() => show("vehicles", v.id)}>
-                  <Eye className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => edit("vehicles", v.id)}>
-                  <Edit className="w-4 h-4" />
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => show("vehicles", v.id)}><Eye className="w-4 h-4" /></Button>
+                <Button variant="outline" size="sm" onClick={() => edit("vehicles", v.id)}><Edit className="w-4 h-4" /></Button>
+                {v.asset_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/admin/maintenances/create?asset_id=${v.asset_id}&kind=usterka`)}
+                  >
+                    <Wrench className="w-4 h-4 mr-1" /> Zgłoś usterkę
+                  </Button>
+                )}
               </FlexBox>
             </CardFooter>
           </Card>
         ))}
       </GridBox>
 
-      <PaginationSwith
-        current={current}
-        pageSize={pageSize}
-        total={data?.total || 0}
-        setCurrent={setCurrent}
-        itemName="pojazdy"
-      />
+      <PaginationSwith current={current} pageSize={pageSize} total={data?.total || 0} setCurrent={setCurrent} itemName="pojazdy" />
     </SubPage>
   );
 };

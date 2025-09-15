@@ -7,10 +7,11 @@ import MaintenancesCreate from "./create";
 import MaintenancesEdit from "./edit";
 import MaintenancesShow from "./show";
 
-export const RES = "asset_maintenances"; // ⬅️ NAZWA TABELI W SUPABASE
+export const RES_LIST = "asset_maintenances"; // view: read-only
+export const RES_WRITE = "asset_service";     // table: create/edit/delete
 
 export const maintenancesResource = {
-  name: RES,
+  name: RES_LIST,
   list: "/admin/maintenances",
   create: "/admin/maintenances/create",
   edit: "/admin/maintenances/edit/:id",

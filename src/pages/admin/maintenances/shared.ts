@@ -1,18 +1,13 @@
 // ================================
-// path: src/pages/admin/maintenances/shared.tsx
+// path: src/pages/admin/maintenances/shared.ts
 // ================================
-export const ASSET_TYPES = [
-    "vehicle",
-    "container",
-    "equipment",
-  ] as const;
-  
-  export const MAINT_TYPES = [
-    "usterka",   // aktywne zgłoszenia usterek
-    "naprawa",
-    "przeglad",
-    "oc",
-    "tacho",
-    "inne",
-  ] as const;
-  
+export const ASSET_KINDS = ["vehicle", "container", "equipment"] as const;
+
+export const SERVICE_KINDS = [
+  "przeglad",
+  "oc",
+  "tacho",
+  "naprawa",
+  "usterka",
+  "inne",
+] as const;

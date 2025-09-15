@@ -4,7 +4,7 @@
 import { useForm } from "@refinedev/react-hook-form";
 import { useNavigation } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
+import { Button, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
 import { Form, FormActions, FormControl } from "@/components/form";
 import { Lead } from "@/components/reader";
 import { FlexBox, GridBox } from "@/components/shared";
@@ -13,12 +13,15 @@ import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const STATUSES = ["na_placu", "u_klienta", "na_samochodzie", "serwis", "inne"] as const;
+const STATUSES = ["na_placu", "u_klienta", "na_pojezdzie", "serwis", "inne"] as const;
 
 export const ContainersEdit = () => {
   const { show } = useNavigation();
-  const { refineCore: { onFinish, queryResult }, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
-    useForm({ refineCoreProps: { resource: "containers", action: "edit" } });
+  const {
+    refineCore: { onFinish, queryResult },
+    register, handleSubmit, setValue, watch,
+    formState: { errors, isSubmitting },
+  } = useForm({ refineCoreProps: { resource: "containers", action: "edit" } });
 
   const isLoading = queryResult?.isLoading ?? true;
   const isError = queryResult?.isError ?? false;
@@ -59,8 +62,8 @@ export const ContainersEdit = () => {
                   placeholder="Wybierz oddział"
                 />
               </FormControl>
-              <FormControl label="Tara [kg]" htmlFor="tare_kg">
-                <Input id="tare_kg" type="number" step="1" {...register("tare_kg", { valueAsNumber: true })} />
+              <FormControl label="Tara [kg]" htmlFor="tara_kg">
+                <Input id="tara_kg" type="number" step="1" {...register("tara_kg", { valueAsNumber: true })} />
               </FormControl>
             </GridBox>
 
@@ -69,10 +72,6 @@ export const ContainersEdit = () => {
                 <SelectTrigger><SelectValue placeholder="Wybierz status" /></SelectTrigger>
                 <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
-            </FormControl>
-
-            <FormControl label="Notatki serwisowe">
-              <Textarea rows={3} {...register("service_notes")} />
             </FormControl>
 
             <FormControl label="Archiwum">

@@ -14,16 +14,13 @@ import { SubPage } from "@/components/layout";
 import { useLoading } from "@/utility";
 import { LookupSelect } from "@/components/form/LookupSelect";
 
-const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"];
+const TYPES = ["ciezarowe","osobowe","przyczepa","naczepa"] as const;
 
 export const VehiclesEdit = () => {
   const { show } = useNavigation();
   const {
     refineCore: { onFinish, queryResult },
-    register,
-    handleSubmit,
-    setValue,
-    watch,
+    register, handleSubmit, setValue, watch,
     formState: { errors, isSubmitting },
   } = useForm({ refineCoreProps: { resource: "vehicles", action: "edit" } });
 
@@ -56,9 +53,7 @@ export const VehiclesEdit = () => {
               <FormControl label="Typ" required>
                 <Select defaultValue={record.type} onValueChange={(v) => setValue("type", v)}>
                   <SelectTrigger><SelectValue placeholder="Wybierz typ" /></SelectTrigger>
-                  <SelectContent>
-                    {TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
+                  <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </FormControl>
             </GridBox>
@@ -73,10 +68,14 @@ export const VehiclesEdit = () => {
                   placeholder="Wybierz oddział"
                 />
               </FormControl>
-              <FormControl label="Tablica rejestracyjna" htmlFor="reg_plate">
+              <FormControl label="Rejestracja" htmlFor="reg_plate">
                 <Input id="reg_plate" {...register("reg_plate")} />
               </FormControl>
             </GridBox>
+
+            <FormControl label="VIN" htmlFor="vin">
+              <Input id="vin" {...register("vin")} />
+            </FormControl>
 
             <FormActions>
               <Button type="button" variant="outline" onClick={() => show("vehicles", record.id)}>Anuluj</Button>
