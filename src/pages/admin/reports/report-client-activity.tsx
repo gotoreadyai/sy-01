@@ -2,7 +2,7 @@
 // path: src/pages/admin/reports/report-client-activity.tsx
 // ================================
 import React from "react";
-import { useTable } from "@refinedev/core";
+import { useTable, type CrudFilters } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button, Input } from "@/components/ui";
 import { Lead } from "@/components/reader";
@@ -21,17 +21,21 @@ export const ClientActivity: React.FC = () => {
   const [from, setFrom] = React.useState<string>("");
   const [to, setTo] = React.useState<string>("");
 
-  const { tableQuery, refetch } = useTable({
+  // Zbuduj filtry z poprawnym typem
+  const permanentFilters: CrudFilters = React.useMemo(
+    () => [
+      ...(clientId ? [{ field: "client_id", operator: "eq" as const, value: clientId }] : []),
+      ...(from ? [{ field: "start_at", operator: "gte" as const, value: from }] : []),
+      ...(to ? [{ field: "start_at", operator: "lte" as const, value: to }] : []),
+    ],
+    [clientId, from, to],
+  );
+
+  const { tableQuery } = useTable({
     resource: "tasks",
-    filters: {
-      permanent: [
-        ...(clientId ? [{ field: "client_id", operator: "eq", value: clientId }] : []),
-        ...(from ? [{ field: "start_at", operator: "gte", value: from }] : []),
-        ...(to ? [{ field: "start_at", operator: "lte", value: to }] : []),
-      ],
-    },
+    filters: { permanent: permanentFilters },
     pagination: { current: 1, pageSize: 1000 },
-    sorters: { initial: [{ field: "start_at", order: "desc" }] },
+    sorters: { initial: [{ field: "start_at", order: "desc" as const }] },
     queryOptions: { enabled: !!clientId },
   });
 
@@ -66,7 +70,11 @@ export const ClientActivity: React.FC = () => {
       <FlexBox>
         <Lead title="Raport: Aktywność klienta" description="Wydarzenia/zadania powiązane z klientem w zakresie dat" />
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetch?.()} disabled={!clientId || loading}>
+          <Button
+            variant="outline"
+            onClick={() => tableQuery.refetch?.()}
+            disabled={!clientId || loading}
+          >
             Odśwież
           </Button>
           <Button onClick={exportCSV} disabled={!rows.length || loading}>
@@ -101,7 +109,9 @@ export const ClientActivity: React.FC = () => {
         </CardHeader>
         <CardContent>
           {error && <div className="text-sm text-red-600">Błąd podczas pobierania danych.</div>}
-          {!loading && !rows.length && clientId && <div className="text-sm text-muted-foreground">Brak danych dla wybranych filtrów.</div>}
+          {!loading && !rows.length && clientId && (
+            <div className="text-sm text-muted-foreground">Brak danych dla wybranych filtrów.</div>
+          )}
           {!clientId && <div className="text-sm text-muted-foreground">Wybierz klienta, aby zobaczyć wyniki.</div>}
           {loading && <div className="text-sm text-muted-foreground">Ładowanie…</div>}
 
