@@ -71,10 +71,12 @@ export const adminResources: IResourceItem[] = [
       icon: <Building2 className="h-4 w-4" />,
     },
   },
+  
   {
     ...addressesResource,
     meta: { ...addressesResource.meta, icon: <MapPin className="h-4 w-4" /> },
   },
+  
   {
     ...pricelistsResource,
     meta: {
