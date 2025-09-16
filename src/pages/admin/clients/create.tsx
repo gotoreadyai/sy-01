@@ -1,5 +1,6 @@
 // ================================
 // path: src/pages/admin/clients/create.tsx
+// (krok 2: zamiast dwóch guzików — pole "etykieta" + 1 przycisk)
 // ================================
 import * as React from "react";
 import { useForm } from "@refinedev/react-hook-form";
@@ -17,7 +18,6 @@ import { LookupSelect } from "@/components/form/LookupSelect";
 import type { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import { ClientAddressLinker } from "./ClientAddressLinker";
 
-
 const SECTIONS = ["zakupy", "sprzedaz", "firmy_transportowe", "inne"] as const;
 type Section = typeof SECTIONS[number];
 
@@ -26,7 +26,7 @@ type ClientFormValues = {
   section?: Section;
   category?: string | null;
   branch_id?: number | null;
-  account_owner?: string | null; // UUID
+  account_owner?: string | null;
   phone?: string | null;
   email?: string | null;
   website?: string | null;
@@ -59,10 +59,7 @@ export const ClientsCreate: React.FC = () => {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<ClientFormValues>({
-    refineCoreProps: {
-      resource: "clients",
-      redirect: false, // ⬅️ blokuje auto-redirect do listy po create
-    },
+    refineCoreProps: { resource: "clients", redirect: false },
     defaultValues: { is_archived: false },
   });
 
@@ -105,11 +102,15 @@ export const ClientsCreate: React.FC = () => {
     queryOptions: { enabled: step === 2 && addressIds.length > 0 },
   });
 
-  const goAddNewAddress = (kind = "Siedziba") => {
+  // 👇 Etykieta dla nowego adresu (dowolna)
+  const [newKind, setNewKind] = React.useState<string>("Siedziba");
+
+  // Tworzenie nowego adresu z powrotem na LISTĘ klientów (jak chciałeś)
+  const goAddNewAddress = (kind?: string) => {
     const q = new URLSearchParams();
     if (clientId) q.set("client", String(clientId));
-    q.set("kind", kind);
-    q.set("return", `/admin/clients/create?step=2&client=${clientId}`);
+    if (kind) q.set("kind", kind);
+    q.set("return", `/admin/clients`);
     navigate(`/admin/addresses/create?${q.toString()}`);
   };
 
@@ -216,11 +217,17 @@ export const ClientsCreate: React.FC = () => {
         <Card className="mt-2">
           <CardHeader><CardTitle>Adresy klienta (ID #{clientId})</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <ClientAddressLinker clientId={clientId} onLinked={() => linksQ.refetch()} />
+            <ClientAddressLinker clientId={clientId} onLinked={() => list("clients")} />
 
-            <div className="flex gap-2">
-              <Button onClick={() => goAddNewAddress("Siedziba")}>Dodaj nowy adres (Siedziba)</Button>
-              <Button variant="outline" onClick={() => goAddNewAddress("Magazyn")}>Dodaj nowy adres (Magazyn)</Button>
+            {/* Tworzenie nowego adresu z dowolną etykietą */}
+            <div className="flex gap-2 items-center">
+              <Input
+                placeholder='Etykieta (np. "Siedziba", "Magazyn", "Plac", "Administracja")'
+                className="w-56"
+                value={newKind}
+                onChange={(e) => setNewKind(e.target.value)}
+              />
+              <Button onClick={() => goAddNewAddress(newKind || undefined)}>Dodaj nowy adres</Button>
             </div>
 
             <Separator />
@@ -272,3 +279,4 @@ export const ClientsCreate: React.FC = () => {
     </SubPage>
   );
 };
+

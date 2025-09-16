@@ -14,7 +14,7 @@ import {
   Files,
   Wrench,
   FileText,
-  MapPin, // ⬅️ NOWE
+  MapPin,
 } from "lucide-react";
 
 import { tasksResource } from "./tasks";
@@ -30,7 +30,7 @@ import { haulsResource } from "./hauls";
 import { maintenancesResource } from "./maintenances";
 import { vacationsResource } from "./vacations";
 import { reportsResource } from "./reports";
-import { addressesResource } from "./addresses"; // ⬅️ NOWE
+import { addressesResource } from "./addresses";
 
 export const adminResources: IResourceItem[] = [
   {
@@ -39,19 +39,92 @@ export const adminResources: IResourceItem[] = [
     meta: { label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
   },
 
-  { ...usersResource,        meta: { ...usersResource.meta,        icon: <Shield className="h-4 w-4" /> } },
-  { ...branchesResource,     meta: { ...branchesResource.meta,     icon: <Building2 className="h-4 w-4" /> } },
-  { ...tasksResource,        meta: { ...tasksResource.meta,        icon: <ListTree className="h-4 w-4" /> } },
-  { ...vehiclesResource,     meta: { ...vehiclesResource.meta,     icon: <Truck className="h-4 w-4" /> } },
-  { ...clientsResource,      meta: { ...clientsResource.meta,      icon: <Users className="h-4 w-4" /> } },
-  { ...addressesResource,    meta: { ...addressesResource.meta,    icon: <MapPin className="h-4 w-4" /> } }, // ⬅️ NOWE
-  { ...containersResource,   meta: { ...containersResource.meta,   icon: <Package className="h-4 w-4" /> } },
-  { ...calendarResource,     meta: { ...calendarResource.meta,     icon: <CalendarDays className="h-4 w-4" /> } },
-  { ...pricelistsResource,   meta: { ...pricelistsResource.meta,   icon: <Files className="h-4 w-4" /> } },
+  {
+    ...calendarResource,
+    meta: {
+      ...calendarResource.meta,
+      icon: <CalendarDays className="h-4 w-4" />,
+    },
+  },
+  {
+    ...tasksResource,
+    meta: { ...tasksResource.meta, icon: <ListTree className="h-4 w-4" /> },
+  },
+  {
+    ...haulsResource,
+    meta: {
+      ...haulsResource.meta,
+      icon: <Truck className="h-4 w-4" />,
+      separatorAfter: true,
+    },
+  },
 
-  { ...equipmentResource,    meta: { ...equipmentResource.meta,    icon: <Package className="h-4 w-4" /> } },
-  { ...haulsResource,        meta: { ...haulsResource.meta,        icon: <Truck className="h-4 w-4" /> } },
-  { ...maintenancesResource, meta: { ...maintenancesResource.meta, icon: <Wrench className="h-4 w-4" /> } },
-  { ...vacationsResource,    meta: { ...vacationsResource.meta,    icon: <CalendarDays className="h-4 w-4" /> } },
-  { ...reportsResource,      meta: { ...reportsResource.meta,      icon: <FileText className="h-4 w-4" /> } },
+
+  {
+    ...clientsResource,
+    meta: { ...clientsResource.meta, icon: <Users className="h-4 w-4" /> },
+  },
+  {
+    ...branchesResource,
+    meta: {
+      ...branchesResource.meta,
+      icon: <Building2 className="h-4 w-4" />,
+    },
+  },
+  {
+    ...addressesResource,
+    meta: { ...addressesResource.meta, icon: <MapPin className="h-4 w-4" /> },
+  },
+  {
+    ...pricelistsResource,
+    meta: {
+      ...pricelistsResource.meta,
+      icon: <Files className="h-4 w-4" />,
+      separatorAfter: true,
+    },
+  },
+
+
+  {
+    ...vehiclesResource,
+    meta: { ...vehiclesResource.meta, icon: <Truck className="h-4 w-4" /> },
+  },
+
+  {
+    ...containersResource,
+    meta: {
+      ...containersResource.meta,
+      icon: <Package className="h-4 w-4" />,
+    },
+  },
+
+  {
+    ...equipmentResource,
+    meta: { ...equipmentResource.meta, icon: <Package className="h-4 w-4" /> },
+  },
+  {
+    ...maintenancesResource,
+    meta: {
+      ...maintenancesResource.meta,
+      icon: <Wrench className="h-4 w-4" />,
+      separatorAfter: true,
+    },
+  },
+ 
+  {
+    ...usersResource,
+    meta: { ...usersResource.meta, icon: <Shield className="h-4 w-4" /> },
+  },
+  {
+    ...vacationsResource,
+    meta: {
+      ...vacationsResource.meta,
+      icon: <CalendarDays className="h-4 w-4" />,
+     
+    },
+  },
+  {
+    ...reportsResource,
+    meta: { ...reportsResource.meta, icon: <FileText className="h-4 w-4" /> },
+  },
 ];

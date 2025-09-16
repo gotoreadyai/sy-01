@@ -1,9 +1,10 @@
 // ================================
 // path: src/pages/admin/clients/show.tsx
+// (naprawa: useState przeniesione nad wczesne returny)
 // ================================
 import { useShow, useNavigation, useList, useMany } from "@refinedev/core";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Badge, Button, Separator } from "@/components/ui";
+import { Badge, Button, Separator, Input } from "@/components/ui";
 import { Lead } from "@/components/reader";
 import { FlexBox } from "@/components/shared";
 import { ArrowLeft, Edit } from "lucide-react";
@@ -11,7 +12,7 @@ import { useLoading } from "@/utility";
 import { SubPage } from "@/components/layout";
 import * as React from "react";
 import { ClientAddressLinker } from "./ClientAddressLinker";
-
+import { useNavigate } from "react-router-dom";
 
 type Client = {
   id: number;
@@ -29,13 +30,7 @@ type Client = {
   updated_at: string;
 };
 
-type ClientAddress = {
-  id: number;
-  client_id: number;
-  address_id: number;
-  kind?: string | null;
-};
-
+type ClientAddress = { id: number; client_id: number; address_id: number; kind?: string | null };
 type Address = {
   id: number;
   line1: string;
@@ -49,6 +44,10 @@ type Address = {
 export const ClientsShow: React.FC = () => {
   const { queryResult } = useShow<Client>({ resource: "clients" });
   const { list, edit } = useNavigation();
+  const navigate = useNavigate();
+
+  // 🔧 WSZYSTKIE HOOKI ZAWSZE NA GÓRZE:
+  const [newKind, setNewKind] = React.useState<string>("Siedziba"); // ⬅️ przeniesione
 
   // Dane klienta
   const isLoading = queryResult?.isLoading ?? true;
@@ -56,13 +55,12 @@ export const ClientsShow: React.FC = () => {
   const record = queryResult?.data?.data;
   const clientId = record?.id;
 
-  // 🔐 HOOKI ZAWSZE NA GÓRZE KOMPONENTU (bez warunków)
-  // Linki klient<->adres
+  // Linki klient<->adres (hooki bezwarunkowo, fetch kontroluje enabled)
   const linksQ = useList<ClientAddress>({
     resource: "client_addresses",
     filters: clientId ? [{ field: "client_id", operator: "eq", value: clientId }] : [],
     pagination: { pageSize: 100 },
-    queryOptions: { enabled: !!clientId }, // odpal tylko gdy znamy ID klienta
+    queryOptions: { enabled: !!clientId },
   });
 
   // Szczegóły adresów
@@ -70,13 +68,23 @@ export const ClientsShow: React.FC = () => {
   const addressesQ = useMany<Address>({
     resource: "addresses",
     ids: addressIds,
-    queryOptions: { enabled: !!clientId && addressIds.length > 0 }, // bezpieczny guard
+    queryOptions: { enabled: !!clientId && addressIds.length > 0 },
   });
 
-  // Dopiero TERAZ wczesne returny
+  // Wczesne returny DOPIERO po zainicjowaniu hooków
   const init = useLoading({ isLoading, isError });
   if (init) return init;
   if (!record) return null;
+
+  // Tworzenie *nowego* adresu z powrotem do szczegółów klienta
+  const goAddNewAddress = (kind?: string) => {
+    if (!clientId) return;
+    const q = new URLSearchParams();
+    q.set("client", String(clientId));
+    if (kind) q.set("kind", kind);
+    q.set("return", `/admin/clients/show/${clientId}`);
+    navigate(`/admin/addresses/create?${q.toString()}`);
+  };
 
   return (
     <SubPage>
@@ -117,6 +125,17 @@ export const ClientsShow: React.FC = () => {
         <CardContent className="space-y-4">
           <ClientAddressLinker clientId={record.id} onLinked={() => linksQ.refetch()} />
 
+          {/* Tworzenie nowego adresu z dowolną etykietą */}
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder='Etykieta (np. "Siedziba", "Magazyn", "Plac", "Administracja")'
+              className="w-56"
+              value={newKind}
+              onChange={(e) => setNewKind(e.target.value)}
+            />
+            <Button onClick={() => goAddNewAddress(newKind || undefined)}>Dodaj nowy adres</Button>
+          </div>
+
           <Separator />
 
           {(linksQ.isLoading || addressesQ.isLoading) && <div>Ładowanie adresów...</div>}
@@ -153,3 +172,4 @@ export const ClientsShow: React.FC = () => {
     </SubPage>
   );
 };
+
