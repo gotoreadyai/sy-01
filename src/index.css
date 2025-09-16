@@ -27,19 +27,20 @@
   --card-foreground: 223 51% 28%;
   --popover: 0 0% 100%;
   --popover-foreground: 223 51% 28%;
-  --primary: 223 51% 28%;
+  /* === ZMIENIONE KOLORY BRANDOWE POD LANDING (emerald → cyan) === */
+  --primary: 161 94% 30%;            /* emerald-600 */
   --primary-foreground: 210 40% 98%;
-  --secondary: 196 54% 54%;
+  --secondary: 193 82% 31%;          /* cyan-700 */
   --secondary-foreground: 0 0% 100%;
   --muted: 210 40% 96%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 177 44% 50%;
+  --accent: 174 84% 32%;             /* teal-600 */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 67% 57%;
   --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 223 51% 28%;
+  --ring: 161 94% 30%;               /* emerald-600 */
   --radius: 0.5rem;
 
   --orange: 29 82% 45%;
@@ -59,19 +60,20 @@
   --card-foreground: 210 40% 98%;
   --popover: 223 51% 8%;
   --popover-foreground: 210 40% 98%;
-  --primary: 196 54% 54%;
+  /* === ZMIENIONE KOLORY BRANDOWE (dark) === */
+  --primary: 174 84% 44%;            /* teal-500/600 */
   --primary-foreground: 223 51% 4%;
-  --secondary: 217.2 32.6% 17.5%;
+  --secondary: 191 91% 44%;          /* cyan-600 */
   --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 177 44% 60%;
+  --accent: 161 94% 40%;             /* emerald-500/600 */
   --accent-foreground: 210 40% 98%;
   --destructive: 0 67% 65%;
   --destructive-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
-  --ring: 196 54% 54%;
+  --ring: 174 84% 44%;
 
   --orange: 29 82% 55%;
   --purple: 267 33% 54%;
