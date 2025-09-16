@@ -23,6 +23,7 @@ import { haulsChildRoutes } from "./hauls";
 import { maintenancesChildRoutes } from "./maintenances";
 import { vacationsChildRoutes } from "./vacations";
 import { reportsChildRoutes } from "./reports";
+import { addressesChildRoutes } from "./addresses"; // ⬅️ NOWE
 
 const AdminRoutes = () => (
   <Routes>
@@ -35,6 +36,7 @@ const AdminRoutes = () => (
       <Route path="tasks">{tasksChildRoutes}</Route>
       <Route path="vehicles">{vehiclesChildRoutes}</Route>
       <Route path="clients">{clientsChildRoutes}</Route>
+      <Route path="addresses">{addressesChildRoutes}</Route> {/* ⬅️ NOWE */}
 
       <Route path="containers">{containersChildRoutes}</Route>
       <Route path="calendar">{calendarChildRoutes}</Route>

@@ -30,7 +30,7 @@ export const BackofficeMenu: React.FC<BackofficeMenuProps> = ({ onClose, brand =
       </div>
 
       <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-4">
+        <nav className="space-y-3">
           {menuItems.map((parent) => (
             <div key={parent.key} className="space-y-2">
               <NavLink
